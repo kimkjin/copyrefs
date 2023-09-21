@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Copiar Texto para Caixa de Texto com Popup
 // @namespace    http://tampermonkey.net/
-// @version      1.0.5
+// @version      1.0.6
 // @description  Detecta texto da classe 'item-reference' e permite copiá-lo para uma caixa de texto com um popup informativo
 // @author       Luan B,
 // @match        *://bobr.privalia.com/productionreorder/index?id=*
@@ -182,7 +182,7 @@
     // Função para exibir o pop-up de referência duplicada apenas uma vez
     function showDuplicatePopup() {
         if (!isDuplicatePopupVisible) {
-            showPopup('Referência já copiada');
+            showPopup('Referência já copiada!');
             isDuplicatePopupVisible = true;
         }
     }
