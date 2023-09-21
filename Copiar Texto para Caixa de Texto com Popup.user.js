@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Copiar Texto para Caixa de Texto com Popup
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.0.4
 // @description  Detecta texto da classe 'item-reference' e permite copiá-lo para uma caixa de texto com um popup informativo
 // @author       Luan B,
 // @match        *://bobr.privalia.com/productionreorder/index?id=*
