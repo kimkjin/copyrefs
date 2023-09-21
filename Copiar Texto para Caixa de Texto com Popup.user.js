@@ -7,7 +7,7 @@
 // @match        *://bobr.privalia.com/productionreorder/index?id=*
 // @grant        GM_setValue
 // @grant        GM_getValue
-// @updateURL    https://github.com/kimkjin/copyrefs/blob/main/Copiar%20Texto%20para%20Caixa%20de%20Texto%20com%20Popup.user.js
+// @updateURL    https://github.com/kimkjin/copyrefs/raw/main/Copiar%20Texto%20para%20Caixa%20de%20Texto%20com%20Popup.user.js
 // ==/UserScript==
 
 
