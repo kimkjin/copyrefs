@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Copiar Texto para Caixa de Texto com Popup
 // @namespace    http://tampermonkey.net/
-// @version      1.0.6
+// @version      1.0.7
 // @description  Copia o nome do item-reference para uma caixa de texto, organizando como lista.
 // @author       Luan B,
 // @match        *://bobr.privalia.com/productionreorder/index?id=*
