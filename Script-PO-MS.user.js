@@ -7,8 +7,8 @@
 // @match        *://bobr.privalia.com/productionreorder/index?id=*
 // @match        *://br.privalia.pin/microsites/shopwindow/campaign/*
 // @match        *://br.privalia.pin/microsites/fittingroom/campaign/*
-// @updateURL    https://raw.githubusercontent.com/kimkjin/copyrefs/main/Script-PO-MS.js
-// @downloadURL  https://raw.githubusercontent.com/kimkjin/copyrefs/main/Script-PO-MS.js
+// @updateURL    https://raw.githubusercontent.com/kimkjin/copyrefs/main/Script-PO-MS.user.js
+// @downloadURL  https://raw.githubusercontent.com/kimkjin/copyrefs/main/Script-PO-MS.user.js
 // @grant        GM_setValue
 // @grant        GM_getValue
 // ==/UserScript==
