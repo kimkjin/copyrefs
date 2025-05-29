@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Script MS - Bobr, MS e Fittingroom (Final V3)
 // @namespace    http://tampermonkey.net/
-// @version      3.1.0
+// @version      3.1.1
 // @description  Copia IDs das REFs: Bobr (referências), Shopwindow e Fittingroom (IDs das imagens).
 // @author       Luan B
 // @match        *://bobr.privalia.com/productionreorder/index?id=*
