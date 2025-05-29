@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Script MS - Bobr, MS e Fittingroom
+// @name         Script MS - Bobr, Shopwindow e Fittingroom
 // @namespace    http://tampermonkey.net/
-// @version      3.1.2
-// @description  Copia IDs das REFs: Bobr, Shopwindow e Fittingroom (IDs das imagens).
+// @version      3.3.1
+// @description  Copia IDs das REFs: Bobr, Shopwindow e Fittingroom e adiciona as refs em uma lista flutuante.
 // @author       Luan B
 // @match        *://bobr.privalia.com/productionreorder/index?id=*
 // @match        *://br.privalia.pin/microsites/shopwindow/campaign/*
@@ -16,9 +16,9 @@
 (function() {
     'use strict';
 
-    let selectedArticles = [];
-    let copiedReferences = [];
-    let autoSaveTimeout;
+    let copiedReferences = new Set();
+    let debounceTimer;
+    let popupElement;
 
     function createTextBox() {
         if (!document.getElementById('copiedText')) {
@@ -43,32 +43,48 @@
             });
             document.body.appendChild(textBox);
 
-            textBox.addEventListener('input', () => {
-                if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
-                autoSaveTimeout = setTimeout(saveTextAutomatically, 1000);
-            });
+            textBox.addEventListener('input', debounceSave);
         }
     }
 
     function showPopup(message) {
-        const popup = document.createElement('div');
-        popup.style.position = 'fixed';
-        popup.style.top = '50px';
-        popup.style.right = '10px';
-        popup.style.padding = '10px';
-        popup.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-        popup.style.color = 'white';
-        popup.style.zIndex = '10001';
-        popup.style.transition = 'opacity 2s';
-        popup.innerHTML = message;
-        document.body.appendChild(popup);
-        setTimeout(() => {
-            popup.style.opacity = '0';
-            setTimeout(() => document.body.removeChild(popup), 2000);
-        }, 3000);
+        if (!popupElement) {
+            popupElement = document.createElement('div');
+            Object.assign(popupElement.style, {
+                position: 'fixed',
+                top: '50px',
+                right: '10px',
+                padding: '10px',
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                color: 'white',
+                zIndex: '10001',
+                transition: 'opacity 0.5s ease',
+                borderRadius: '4px',
+                fontFamily: 'Poppins, sans-serif',
+                fontSize: '14px',
+                maxWidth: '300px',
+                wordBreak: 'break-word',
+                opacity: '0'
+            });
+            document.body.appendChild(popupElement);
+        }
+        popupElement.textContent = message;
+        popupElement.style.opacity = '1';
+        clearTimeout(popupElement.hideTimeout);
+        popupElement.hideTimeout = setTimeout(() => { popupElement.style.opacity = '0'; }, 2000);
     }
 
-    function saveTextAutomatically() {
+    function debounceSave() {
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            const textBox = document.getElementById('copiedText');
+            if (textBox) {
+                GM_setValue('copiedText', textBox.value);
+            }
+        }, 500);
+    }
+
+    function saveNow() {
         const textBox = document.getElementById('copiedText');
         if (textBox) GM_setValue('copiedText', textBox.value);
     }
@@ -79,51 +95,32 @@
             const textBox = document.getElementById('copiedText');
             if (textBox) {
                 textBox.value = savedText;
-                copiedReferences = savedText.split('\n').map(item => item.trim()).filter(Boolean);
+                copiedReferences = new Set(savedText.split('\n').map(item => item.trim()).filter(Boolean));
             }
         }
     }
 
-    //  Bobr
-    function addClickListenersToArticles() {
-        const articles = document.querySelectorAll('article[id^="item-"]');
-        articles.forEach(article => {
-            article.addEventListener('click', () => {
-                selectedArticles.forEach(a => a.classList.remove('selected'));
-                selectedArticles = [article];
-                article.classList.add('selected');
-
-                const textElement = article.querySelector('.item-reference');
-                if (textElement) {
-                    const text = textElement.textContent.trim();
-                    if (text && !copiedReferences.includes(text)) {
-                        const textBox = document.getElementById('copiedText');
-                        textBox.value += text + '\n';
-                        copiedReferences.push(text);
-                        saveTextAutomatically();
-                        showPopup('Referência copiada: ' + text);
-                    } else {
-                        showPopup('Referência já copiada!');
-                    }
+    // Bobr
+    window.addEventListener('click', function(event) {
+        const article = event.target.closest('article[id^="item-"]');
+        if (article) {
+            const textElement = article.querySelector('.item-reference');
+            if (textElement) {
+                const text = textElement.textContent.trim();
+                if (text && !copiedReferences.has(text)) {
+                    const textBox = document.getElementById('copiedText');
+                    textBox.value += text + '\n';
+                    copiedReferences.add(text);
+                    saveNow();
+                    showPopup('Referência copiada: ' + text);
+                } else {
+                    showPopup('Referência já copiada!');
                 }
-            });
-        });
-    }
+            }
+        }
+    }, true);
 
-    function addCopyButtonBobr() {
-        const copyButton = document.createElement('button');
-        copyButton.textContent = 'Salvar manualmente';
-        copyButton.style.position = 'fixed';
-        copyButton.style.top = '120px';
-        copyButton.style.right = '20px';
-        copyButton.addEventListener('click', () => {
-            saveTextAutomatically();
-            showPopup('Lista salva!');
-        });
-        document.body.appendChild(copyButton);
-    }
-
-    // MS + Pagina do produto
+    // Shopwindow + Fittingroom
     function addCopyButtonToContainers() {
         const containers = document.querySelectorAll('div.productlist_image.clearfix.rel');
         containers.forEach(container => {
@@ -187,10 +184,10 @@
                     if (match && match[1]) {
                         const refId = match[1];
                         const textBox = document.getElementById('copiedText');
-                        if (textBox && !copiedReferences.includes(refId)) {
+                        if (textBox && !copiedReferences.has(refId)) {
                             textBox.value += refId + '\n';
-                            copiedReferences.push(refId);
-                            saveTextAutomatically();
+                            copiedReferences.add(refId);
+                            debounceSave();
                             showPopup('Referência copiada: ' + refId);
                         } else {
                             showPopup('Referência já copiada!');
@@ -214,10 +211,10 @@
                 if (match && match[1]) {
                     const refId = match[1];
                     const textBox = document.getElementById('copiedText');
-                    if (textBox && !copiedReferences.includes(refId)) {
+                    if (textBox && !copiedReferences.has(refId)) {
                         textBox.value += refId + '\n';
-                        copiedReferences.push(refId);
-                        saveTextAutomatically();
+                        copiedReferences.add(refId);
+                        debounceSave();
                         showPopup('Referência copiada: ' + refId);
                     } else {
                         showPopup('Referência já copiada!');
@@ -231,16 +228,9 @@
         }
     }, true);
 
-    // start
+    // Inicialização
     createTextBox();
     loadSavedText();
-
-    if (window.location.href.includes('/productionreorder/index')) {
-        addClickListenersToArticles();
-        addCopyButtonBobr();
-        new MutationObserver(() => addClickListenersToArticles()).observe(document.body, { childList: true, subtree: true });
-        showPopup('Script Bobr ativado!');
-    }
 
     if (window.location.href.includes('/shopwindow/campaign/') || window.location.href.includes('/fittingroom/campaign/')) {
         setTimeout(() => {
