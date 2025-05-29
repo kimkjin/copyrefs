@@ -2,7 +2,7 @@
 // @name         Script MS - Bobr, MS e Fittingroom
 // @namespace    http://tampermonkey.net/
 // @version      3.1.2
-// @description  Copia IDs das REFs: Bobr (referências), Shopwindow e Fittingroom (IDs das imagens).
+// @description  Copia IDs das REFs: Bobr, Shopwindow e Fittingroom (IDs das imagens).
 // @author       Luan B
 // @match        *://bobr.privalia.com/productionreorder/index?id=*
 // @match        *://br.privalia.pin/microsites/shopwindow/campaign/*
@@ -24,14 +24,25 @@
         if (!document.getElementById('copiedText')) {
             const textBox = document.createElement('textarea');
             textBox.id = 'copiedText';
-            textBox.style.position = 'fixed';
-            textBox.style.top = '150px';
-            textBox.style.right = '20px';
-            textBox.style.width = '300px';
-            textBox.style.height = '300px';
-            textBox.style.overflowY = 'auto';
-            textBox.style.zIndex = '10000';
+            Object.assign(textBox.style, {
+                position: 'fixed',
+                top: '150px',
+                right: '20px',
+                width: '300px',
+                height: '300px',
+                overflowY: 'auto',
+                padding: '10px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                backgroundColor: '#fff',
+                color: '#838384',
+                fontSize: '14px',
+                fontFamily: 'Poppins, sans-serif',
+                zIndex: '10000',
+                boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+            });
             document.body.appendChild(textBox);
+
             textBox.addEventListener('input', () => {
                 if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
                 autoSaveTimeout = setTimeout(saveTextAutomatically, 1000);
